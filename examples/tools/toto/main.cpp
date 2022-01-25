@@ -22,6 +22,31 @@ using namespace QBDL;
 using namespace std;
 
 
+namespace {
+
+struct FinalTargetSystem: public Engines::Native::TargetSystem {
+  using Engines::Native::TargetSystem::TargetSystem;
+  inline static void* libc_hdl = dlopen("libc.so.6", RTLD_NOW);
+
+  uint64_t symlink(Loader &loader, const LIEF::Symbol &sym) override {
+    printf("%s  ", sym.name().c_str());
+    if (dlsym(libc_hdl, sym.name().c_str()) == 0)
+    {
+      cout << "non" << endl;
+    }
+    else
+    {
+      cout << "oui" << endl;
+    }
+
+    return reinterpret_cast<uint64_t>(dlsym(libc_hdl, sym.name().c_str()));
+  }
+};
+
+}
+
+
+
 int main(int argc, char **argv) {
   cout << "coucou\n";
   JavaVMOption jvmopt[1];
@@ -61,6 +86,21 @@ int main(int argc, char **argv) {
       }
     }
   }
+
+  auto mem = std::make_unique<Engines::Native::TargetMemory>();
+  auto system = std::make_unique<FinalTargetSystem>(*mem);
+
+  const char *path = argv[1];
+
+  std::unique_ptr<Loaders::ELF> loader = Loaders::ELF::from_file(
+      path, *system, Loader::BIND::NOW);
+  if (!loader) {
+    fprintf(stderr, "unable to load binary!\n");
+    return EXIT_FAILURE;
+  }
+  
+
+  
   javaVM->DestroyJavaVM();
   return 0;
 }
