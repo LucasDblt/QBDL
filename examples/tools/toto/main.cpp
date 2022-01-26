@@ -21,6 +21,23 @@
 using namespace QBDL;
 using namespace std;
 
+int my_strlen(const char *s, size_t)
+{
+  return strlen(s);
+}
+void my_android_set_abort_message(const char* msg)
+{
+
+}
+void my_android_log_print(int prio, const char *tag, const char *fmt ...)
+{
+  va_list argp;
+  va_start(argp, fmt);
+  vprintf(fmt, argp);
+  va_end(argp);
+}
+
+
 
 namespace {
 
@@ -29,7 +46,8 @@ struct FinalTargetSystem: public Engines::Native::TargetSystem {
   inline static void* libc_hdl = dlopen("libc.so.6", RTLD_NOW);
 
   uint64_t symlink(Loader &loader, const LIEF::Symbol &sym) override {
-    printf("%s  ", sym.name().c_str());
+    printf("%s\n", sym.name().c_str());
+    /*
     if (dlsym(libc_hdl, sym.name().c_str()) == 0)
     {
       cout << "non" << endl;
@@ -38,7 +56,19 @@ struct FinalTargetSystem: public Engines::Native::TargetSystem {
     {
       cout << "oui" << endl;
     }
-
+    */
+    if (sym.name().c_str()=="__strlen_chk")
+    {
+      return reinterpret_cast<uint64_t>(my_strlen);
+    }
+    if (sym.name().c_str()=="android_set_abort_message")
+    {
+      return reinterpret_cast<uint64_t>(my_android_set_abort_message);
+    }
+    if (sym.name().c_str()=="__android_log_print")
+    {
+      return reinterpret_cast<uint64_t>(my_android_log_print);
+    }
     return reinterpret_cast<uint64_t>(dlsym(libc_hdl, sym.name().c_str()));
   }
 };
@@ -49,6 +79,7 @@ struct FinalTargetSystem: public Engines::Native::TargetSystem {
 
 int main(int argc, char **argv) {
   cout << "coucou\n";
+  /*
   JavaVMOption jvmopt[1];
   string javaOption = string{"-Djava.class.path="} + SOURCE_PATH;
   jvmopt[0].optionString = const_cast<char*>(javaOption.c_str());
@@ -86,7 +117,7 @@ int main(int argc, char **argv) {
       }
     }
   }
-
+  */
   auto mem = std::make_unique<Engines::Native::TargetMemory>();
   auto system = std::make_unique<FinalTargetSystem>(*mem);
 
@@ -98,9 +129,16 @@ int main(int argc, char **argv) {
     fprintf(stderr, "unable to load binary!\n");
     return EXIT_FAILURE;
   }
-  
+  using add_fcn_t = int(*)(void*, void*, int, int);
+  auto add = reinterpret_cast<add_fcn_t>(loader->get_address("Java_com_example_myapplication_MainActivity_add"));
+  if (add == nullptr) {
+    fprintf(stderr, "Can't find symbol 'add'\n");
+    return 1;
+  }
+  int s = add(nullptr, nullptr, 2, 9);
+  cout << "result : " << s << endl;
 
   
-  javaVM->DestroyJavaVM();
+  //javaVM->DestroyJavaVM();
   return 0;
 }
