@@ -16,6 +16,7 @@
 #include <QBDL/engines/Native.hpp>
 #include <QBDL/loaders/ELF.hpp>
 
+
 #include "path.h"
 
 using namespace QBDL;
@@ -57,15 +58,15 @@ struct FinalTargetSystem: public Engines::Native::TargetSystem {
       cout << "oui" << endl;
     }
     */
-    if (sym.name().c_str()=="__strlen_chk")
+    if (sym.name()=="__strlen_chk")
     {
       return reinterpret_cast<uint64_t>(my_strlen);
     }
-    if (sym.name().c_str()=="android_set_abort_message")
+    if (sym.name()=="android_set_abort_message")
     {
       return reinterpret_cast<uint64_t>(my_android_set_abort_message);
     }
-    if (sym.name().c_str()=="__android_log_print")
+    if (sym.name()=="__android_log_print")
     {
       return reinterpret_cast<uint64_t>(my_android_log_print);
     }
@@ -79,9 +80,9 @@ struct FinalTargetSystem: public Engines::Native::TargetSystem {
 
 int main(int argc, char **argv) {
   cout << "coucou\n";
-  /*
+  
   JavaVMOption jvmopt[1];
-  string javaOption = string{"-Djava.class.path="} + SOURCE_PATH;
+  string javaOption = string{"-Djava.class.path=/home/lucas/dev/example-android-native-app/app/build/intermediates/javac/debug/classes"};
   jvmopt[0].optionString = const_cast<char*>(javaOption.c_str());
   JavaVMInitArgs vmArgs;
   vmArgs.version = JNI_VERSION_1_6;
@@ -99,17 +100,19 @@ int main(int argc, char **argv) {
      return 1;
   }
 
-
-  jclass jcls = jniEnv->FindClass("org/jnijvm/Tata");
+  jclass jcls = jniEnv->FindClass("com/example/myapplication/MainActivity");
+  //jclass jcls = jniEnv->FindClass("org/jnijvm/Tata");
   if (jcls == NULL) {
   jniEnv->ExceptionDescribe();
   javaVM->DestroyJavaVM();
+  cout << "salut1" << endl;
     return 1;
   }
   if (jcls != NULL) {
     jmethodID methodId = jniEnv->GetStaticMethodID(jcls, "greet", "(Ljava/lang/String;)V");
     if (methodId != NULL) {
       jstring str = jniEnv->NewStringUTF("salut\n");
+      cout << "salut2" << endl;
       jniEnv->CallStaticVoidMethod(jcls, methodId, str);
       if (jniEnv->ExceptionCheck()) {
         jniEnv->ExceptionDescribe();
@@ -117,7 +120,8 @@ int main(int argc, char **argv) {
       }
     }
   }
-  */
+
+
   auto mem = std::make_unique<Engines::Native::TargetMemory>();
   auto system = std::make_unique<FinalTargetSystem>(*mem);
 
@@ -136,9 +140,23 @@ int main(int argc, char **argv) {
     return 1;
   }
   int s = add(nullptr, nullptr, 2, 9);
+ 
   cout << "result : " << s << endl;
 
+  using nativeMul_fcn_t = int(*)(JNIEnv*, void*, int, int);
+  auto nativeMul = reinterpret_cast<nativeMul_fcn_t>(loader->get_address("Java_com_example_myapplication_MainActivity_nativeMul"));
+  if (nativeMul == nullptr) {
+    fprintf(stderr, "Can't find symbol 'nativeMul'\n");
+    return 1;
+  }
+
+  int t = nativeMul(jniEnv, nullptr, 2, 9);
+
+  cout << "result : " << t << endl;
+
   
-  //javaVM->DestroyJavaVM();
+  javaVM->DestroyJavaVM();
   return 0;
 }
+
+
