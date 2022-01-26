@@ -8,7 +8,7 @@
 #include <iostream>
 #include <jni.h>
 #include <string>
-
+#include <sstream>
 
 
 #include <LIEF/LIEF.hpp>
@@ -80,9 +80,27 @@ struct FinalTargetSystem: public Engines::Native::TargetSystem {
 
 int main(int argc, char **argv) {
   cout << "coucou\n";
+  string tabClasses[4]={"/home/lucas/dev/example-android-native-app/app/build/intermediates/javac/debug/classes", SOURCE_PATH, "/home/lucas/.gradle/caches/transforms-3/d18bfc700c6d6b2046e9ad58467e8155/transformed/appcompat-1.2.0-runtime.jar", "/home/lucas/.gradle/caches/transforms-3/76daf7c648fcd60b1fa8502269df1152/transformed/versionedparcelable-1.1.0/aidl"};
   
   JavaVMOption jvmopt[1];
-  string javaOption = string{"-Djava.class.path=/home/lucas/dev/example-android-native-app/app/build/intermediates/javac/debug/classes"};
+  string javaOption = string{"-Djava.class.path="};
+  for (int i=0; i<4; i++)
+  {
+
+    //javaOption = javaOption + ".:" + tabClasses[i];
+    ///*
+    if (i!=0)
+    {
+      javaOption = javaOption + ":" + tabClasses[i];
+    }
+    else
+    {
+      javaOption = javaOption + tabClasses[i];
+    }
+    //*/
+  }
+  cout << javaOption << endl;
+  
   jvmopt[0].optionString = const_cast<char*>(javaOption.c_str());
   JavaVMInitArgs vmArgs;
   vmArgs.version = JNI_VERSION_1_6;
