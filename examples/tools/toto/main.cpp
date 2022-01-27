@@ -99,9 +99,18 @@ string foo()
   {
     Paths << p << ":";
   }
+  if (dependencies)
+  {
+    cout << "trouve" << endl;
+  }
+  else
+  {
+    cout << "pas trouve" << endl;
+  }
   while (getline(dependencies, line))
   {
     Paths << line << ":";
+    cout << line << endl;
   }
   return Paths.str();
 }
