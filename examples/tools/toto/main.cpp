@@ -9,6 +9,8 @@
 #include <jni.h>
 #include <string>
 #include <sstream>
+#include <vector>
+#include <fstream>
 
 
 #include <LIEF/LIEF.hpp>
@@ -77,18 +79,48 @@ struct FinalTargetSystem: public Engines::Native::TargetSystem {
 }
 
 
+string foo()
+{
+
+  ifstream dependencies("/home/lucas/dev/QBDL/examples/tools/toto/dependencies.txt");
+  string line;
+
+  vector <string> ArrayOfPaths{
+    "/home/lucas/dev/example-android-native-app/app/build/intermediates/javac/debug/classes",
+    SOURCE_PATH,
+    "/home/lucas/.gradle/caches/transforms-3/d18bfc700c6d6b2046e9ad58467e8155/transformed/appcompat-1.2.0-runtime.jar",
+    "/home/lucas/.gradle/caches/transforms-3/ef6a0bc1faa09020a3bfd9e98080f026/transformed/core-1.3.1-runtime.jar"
+  };
+
+  
+
+  stringstream Paths;
+  for (auto &p : ArrayOfPaths)
+  {
+    Paths << p << ":";
+  }
+  while (getline(dependencies, line))
+  {
+    Paths << line << ":";
+  }
+  return Paths.str();
+}
+
 
 int main(int argc, char **argv) {
   cout << "coucou\n";
-  string tabClasses[4]={"/home/lucas/dev/example-android-native-app/app/build/intermediates/javac/debug/classes", SOURCE_PATH, "/home/lucas/.gradle/caches/transforms-3/d18bfc700c6d6b2046e9ad58467e8155/transformed/appcompat-1.2.0-runtime.jar", "/home/lucas/.gradle/caches/transforms-3/76daf7c648fcd60b1fa8502269df1152/transformed/versionedparcelable-1.1.0/aidl"};
+  
+  
+
+  //string tabClasses[4]={"/home/lucas/dev/example-android-native-app/app/build/intermediates/javac/debug/classes", SOURCE_PATH, "/home/lucas/.gradle/caches/transforms-3/d18bfc700c6d6b2046e9ad58467e8155/transformed/appcompat-1.2.0-runtime.jar", "/home/lucas/.gradle/caches/transforms-3/ef6a0bc1faa09020a3bfd9e98080f026/transformed/core-1.3.1-runtime.jar"};
   
   JavaVMOption jvmopt[1];
-  string javaOption = string{"-Djava.class.path="};
-  for (int i=0; i<4; i++)
+  string javaOption = string{"-Djava.class.path="} + foo();
+  /*for (int i=0; i<4; i++)
   {
 
     //javaOption = javaOption + ".:" + tabClasses[i];
-    ///*
+    
     if (i!=0)
     {
       javaOption = javaOption + ":" + tabClasses[i];
@@ -97,9 +129,12 @@ int main(int argc, char **argv) {
     {
       javaOption = javaOption + tabClasses[i];
     }
-    //*/
-  }
+    
+  }*/
   cout << javaOption << endl;
+
+  //cout << "Full options : \"" << foo() << "\"\n";
+
   
   jvmopt[0].optionString = const_cast<char*>(javaOption.c_str());
   JavaVMInitArgs vmArgs;
