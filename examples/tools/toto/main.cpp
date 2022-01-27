@@ -11,6 +11,7 @@
 #include <sstream>
 #include <vector>
 #include <fstream>
+#include <getopt.h>
 
 
 #include <LIEF/LIEF.hpp>
@@ -79,10 +80,12 @@ struct FinalTargetSystem: public Engines::Native::TargetSystem {
 }
 
 
-string foo()
+string GetClassPath(string optarg)
 {
 
-  ifstream dependencies("/home/lucas/dev/QBDL/examples/tools/toto/dependencies.txt");
+  //ifstream dependencies("/home/lucas/dev/QBDL/build/examples/tools/toto/dependencies.txt");
+  
+  ifstream dependencies("optarg");
   string line;
 
   vector <string> ArrayOfPaths{
@@ -99,50 +102,35 @@ string foo()
   {
     Paths << p << ":";
   }
-  if (dependencies)
-  {
-    cout << "trouve" << endl;
-  }
-  else
-  {
-    cout << "pas trouve" << endl;
-  }
   while (getline(dependencies, line))
   {
     Paths << line << ":";
-    cout << line << endl;
   }
   return Paths.str();
 }
 
 
 int main(int argc, char **argv) {
+  
+  char option = getopt(argc, argv, "d:");
+  string javaOption;
   cout << "coucou\n";
-  
-  
-
-  //string tabClasses[4]={"/home/lucas/dev/example-android-native-app/app/build/intermediates/javac/debug/classes", SOURCE_PATH, "/home/lucas/.gradle/caches/transforms-3/d18bfc700c6d6b2046e9ad58467e8155/transformed/appcompat-1.2.0-runtime.jar", "/home/lucas/.gradle/caches/transforms-3/ef6a0bc1faa09020a3bfd9e98080f026/transformed/core-1.3.1-runtime.jar"};
-  
   JavaVMOption jvmopt[1];
-  string javaOption = string{"-Djava.class.path="} + foo();
-  /*for (int i=0; i<4; i++)
+
+  
+  switch (option)
   {
+    case 'd' : 
+      javaOption = string{"-Djava.class.path="} + GetClassPath(optarg);
+      break;
+    default :
+      cout << "erreur" << endl;
+      return 1;
+  }
 
-    //javaOption = javaOption + ".:" + tabClasses[i];
-    
-    if (i!=0)
-    {
-      javaOption = javaOption + ":" + tabClasses[i];
-    }
-    else
-    {
-      javaOption = javaOption + tabClasses[i];
-    }
-    
-  }*/
-  cout << javaOption << endl;
+  
+  
 
-  //cout << "Full options : \"" << foo() << "\"\n";
 
   
   jvmopt[0].optionString = const_cast<char*>(javaOption.c_str());
