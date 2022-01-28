@@ -12,6 +12,7 @@
 #include <vector>
 #include <fstream>
 #include <getopt.h>
+#include <utility>
 
 
 #include <LIEF/LIEF.hpp>
@@ -22,6 +23,8 @@
 
 #include "path.h"
 #include "classpath.h"
+#include "options.h"
+#include "JVM.h"
 
 using namespace QBDL;
 using namespace std;
@@ -83,28 +86,25 @@ struct FinalTargetSystem: public Engines::Native::TargetSystem {
 
 int main(int argc, char **argv) {
   
-  char option = getopt(argc, argv, "d:");
-  string javaOption;
+
   cout << "coucou\n";
-  JavaVMOption jvmopt[1];
-
   
-  switch (option)
-  {
-    case 'd' : 
-      javaOption = string{"-Djava.class.path="} + GetClassPath(optarg);
-      break;
-    default :
-      cout << "erreur" << endl;
-      return 1;
-  }
+  string javaOption = options(argc, argv);
 
+  ////pair jvm = JVM(javaOption);
+  
+  
+  
+  /////*
+  JavaVMOption jvmopt[1];
   jvmopt[0].optionString = const_cast<char*>(javaOption.c_str());
   JavaVMInitArgs vmArgs;
   vmArgs.version = JNI_VERSION_1_6;
   vmArgs.nOptions = 1;
   vmArgs.options = jvmopt;
   vmArgs.ignoreUnrecognized = JNI_TRUE;
+
+
 
   // Create the JVM
   JavaVM *javaVM;
@@ -136,7 +136,11 @@ int main(int argc, char **argv) {
       }
     }
   }
+  ////*/
 
+
+  ////JavaVM *javaVM = &(jvm.first);
+  ////JNIEnv *jniEnv = &(jvm.second);
 
   auto mem = std::make_unique<Engines::Native::TargetMemory>();
   auto system = std::make_unique<FinalTargetSystem>(*mem);

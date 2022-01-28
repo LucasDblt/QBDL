@@ -2,7 +2,15 @@ find_package (JNI REQUIRED)
 
 
 
-add_executable(android_native_run  main.cpp classpath.cpp classpath.h)
+add_executable(android_native_run
+ main.cpp
+ classpath.cpp
+ classpath.h
+ options.cpp
+ options.h
+ JVM.cpp
+ JVM.h
+ )
 
 
 configure_file(path.h.in ${CMAKE_CURRENT_BINARY_DIR}/path.h @ONLY)
