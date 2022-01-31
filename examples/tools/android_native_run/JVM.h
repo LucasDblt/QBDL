@@ -1,4 +1,4 @@
-
+/*
 #pragma once
 
 #include <csignal>
@@ -25,3 +25,4 @@
 using namespace std;
 
 pair<JavaVM, JNIEnv> JVM(string);
+*/

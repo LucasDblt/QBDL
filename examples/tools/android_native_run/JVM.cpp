@@ -6,7 +6,7 @@
 
 using namespace std;
 
-pair<javaVM, jniEnv> JVM(javaOption) {
+pair<JavaVM, JNIEnv> JVM(javaOption) {
 
   JavaVMOption jvmopt[1];
   jvmopt[0].optionString = const_cast<char *>(javaOption.c_str());
