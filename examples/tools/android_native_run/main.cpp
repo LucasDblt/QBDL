@@ -25,25 +25,10 @@
 #include "classpath.h"
 #include "options.h"
 #include "JVM.h"
+#include "myfunctions.h"
 
 using namespace QBDL;
 using namespace std;
-
-int my_strlen(const char *s, size_t)
-{
-  return strlen(s);
-}
-void my_android_set_abort_message(const char* msg)
-{
-
-}
-void my_android_log_print(int prio, const char *tag, const char *fmt ...)
-{
-  va_list argp;
-  va_start(argp, fmt);
-  vprintf(fmt, argp);
-  va_end(argp);
-}
 
 
 
@@ -55,16 +40,7 @@ struct FinalTargetSystem: public Engines::Native::TargetSystem {
 
   uint64_t symlink(Loader &loader, const LIEF::Symbol &sym) override {
     printf("%s\n", sym.name().c_str());
-    /*
-    if (dlsym(libc_hdl, sym.name().c_str()) == 0)
-    {
-      cout << "non" << endl;
-    }
-    else
-    {
-      cout << "oui" << endl;
-    }
-    */
+
     if (sym.name()=="__strlen_chk")
     {
       return reinterpret_cast<uint64_t>(my_strlen);
@@ -89,7 +65,7 @@ int main(int argc, char **argv) {
 
   cout << "coucou\n";
   
-  string javaOption = options(argc, argv);
+  string javaOption = options(argc, argv,0,0,0);
 
   ////pair jvm = JVM(javaOption);
   

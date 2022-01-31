@@ -10,6 +10,8 @@ add_executable(android_native_run
  options.h
  JVM.cpp
  JVM.h
+ myfunctions.h
+ myfunctions.cpp
  )
 
 
