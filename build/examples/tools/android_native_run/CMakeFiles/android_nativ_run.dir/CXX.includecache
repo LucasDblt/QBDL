@@ -1,0 +1,12 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/lucas/dev/QBDL/examples/tools/android_native_run/classpath.cpp
+classpath.h
+/home/lucas/dev/QBDL/examples/tools/android_native_run/classpath.h
+
