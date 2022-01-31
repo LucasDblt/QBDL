@@ -1,1 +1,0 @@
-/usr/bin/c++ -fPIC -g -shared -Wl,-soname,libandroid_nativ_run.so -o libandroid_nativ_run.so CMakeFiles/android_nativ_run.dir/classpath.cpp.o 
