@@ -67,11 +67,11 @@ int main(int argc, char **argv) {
   
   string javaOption = options(argc, argv,0,0,0);
 
-  ////pair jvm = JVM(javaOption);
+  pair jvm = JVM(javaOption);
   
   
   
-  /////*
+  /*
   JavaVMOption jvmopt[1];
   jvmopt[0].optionString = const_cast<char*>(javaOption.c_str());
   JavaVMInitArgs vmArgs;
@@ -112,11 +112,11 @@ int main(int argc, char **argv) {
       }
     }
   }
-  ////*/
+  */
 
 
-  ////JavaVM *javaVM = &(jvm.first);
-  ////JNIEnv *jniEnv = &(jvm.second);
+  JavaVM *javaVM = &(jvm.first);
+  JNIEnv *jniEnv = &(jvm.second);
 
   auto mem = std::make_unique<Engines::Native::TargetMemory>();
   auto system = std::make_unique<FinalTargetSystem>(*mem);
